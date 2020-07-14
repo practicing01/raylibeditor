@@ -111,6 +111,9 @@ GuiDMProperty selProp[] = {
 };
 int selPropFocus = 0, selPropScroll = 0;
 
+int dropdownBox000Active = 0;
+bool dropDown000EditMode = false;
+
 void DrawGui()
 {
 	//open dialog
@@ -140,9 +143,43 @@ void DrawGui()
 	}
     
     //general properties list
-    GuiDMPropertyList((Rectangle){0, (SCREEN_HEIGHT - 280)/2, 180, 280}, genProp, SIZEOF(genProp), &genPropFocus, &genPropScroll);
+    GuiDMPropertyList((Rectangle){0, 30, 180, 280}, genProp, SIZEOF(genProp), &genPropFocus, &genPropScroll);
     
     //selection properties list
     GuiDMPropertyList((Rectangle){SCREEN_WIDTH - 180, (SCREEN_HEIGHT - 280)/2, 180, 280}, selProp, SIZEOF(selProp), &selPropFocus, &selPropScroll);
     
+    //add node butt
+	Rectangle addNodeRect;
+	addNodeRect.x = 390;
+	addNodeRect.y = 0;
+	addNodeRect.width = 50;
+	addNodeRect.height = 25;
+	
+	DrawRectangleRec( addNodeRect , LIGHTGRAY);
+	
+	if (CheckCollisionPointRec(GetMousePosition(), addNodeRect) )
+	{
+		DrawRectangleLines( addNodeRect.x, addNodeRect.y,
+		addNodeRect.width, addNodeRect.height, RED);
+		
+		if (IsMouseButtonDown(MOUSE_LEFT_BUTTON))
+		{
+			//add node here
+		};
+	}
+	else
+	{
+		DrawRectangleLines( addNodeRect.x, addNodeRect.y,
+		addNodeRect.width, addNodeRect.height, DARKGRAY);
+	}
+	
+	DrawText( "add",
+		addNodeRect.x,
+		addNodeRect.y,
+		20, MAROON);
+		
+    //new object type
+    if (GuiDropdownBox((Rectangle){ 265,0, 125, 30 },
+    "node;model;spawn",
+    &dropdownBox000Active, dropDown000EditMode)) dropDown000EditMode = !dropDown000EditMode;
 }
