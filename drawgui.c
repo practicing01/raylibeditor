@@ -1,6 +1,7 @@
 #include "raylib.h"
 #include "drawgui.h"
 #include "moduleLoop.h"
+#include <string.h>
 
 #define RAYGUI_IMPLEMENTATION
 #define RAYGUI_SUPPORT_ICONS
@@ -111,8 +112,44 @@ GuiDMProperty selProp[] = {
 };
 int selPropFocus = 0, selPropScroll = 0;
 
-int dropdownBox000Active = 0;
-bool dropDown000EditMode = false;
+int nodeTypeActive = 0;
+bool nodeTypeEditMode = false;
+int modelListActive = -1;
+int modeListScrollIndex = 0;
+
+void GetModelNames(char *curDir)
+{
+	int dirFilesCount = 0;
+    char **files = GetDirectoryFiles(curDir, &dirFilesCount);
+    
+    for (int x = 0; x < dirFilesCount; x++)
+    {
+		char filePath[1024];
+		strcpy(filePath, curDir );
+		strcat(filePath, "/");
+		strcat(filePath, files[x]);
+		
+		TraceLog(LOG_INFO, files[x]);
+		TraceLog(LOG_INFO, filePath);
+		
+		if (DirectoryExists(filePath))
+		{
+			if (strcmp(files[x], ".") != 0 && strcmp(files[x], ".."))
+			{
+				GetModelNames(filePath);
+			}
+		}
+		else//not a directory
+		{
+			if (FileExists(filePath))
+			{
+				TraceLog(LOG_INFO, "file exists");
+			}
+		}
+	}
+	
+	ClearDirectoryFiles();
+}
 
 void DrawGui()
 {
@@ -143,7 +180,7 @@ void DrawGui()
 	}
     
     //general properties list
-    GuiDMPropertyList((Rectangle){0, 30, 180, 280}, genProp, SIZEOF(genProp), &genPropFocus, &genPropScroll);
+    GuiDMPropertyList((Rectangle){0, 30, 180, 400}, genProp, SIZEOF(genProp), &genPropFocus, &genPropScroll);
     
     //selection properties list
     GuiDMPropertyList((Rectangle){SCREEN_WIDTH - 180, (SCREEN_HEIGHT - 280)/2, 180, 280}, selProp, SIZEOF(selProp), &selPropFocus, &selPropScroll);
@@ -181,5 +218,8 @@ void DrawGui()
     //new object type
     if (GuiDropdownBox((Rectangle){ 265,0, 125, 30 },
     "node;model;spawn",
-    &dropdownBox000Active, dropDown000EditMode)) dropDown000EditMode = !dropDown000EditMode;
+    &nodeTypeActive, nodeTypeEditMode)) nodeTypeEditMode = !nodeTypeEditMode;
+    
+    //models list
+    modelListActive = GuiListView((Rectangle){ 0, SCREEN_HEIGHT/2, 180, 384 }, "Charmander;Bulbasaur;#18#Squirtel;Pikachu;Eevee;Pidgey", &modeListScrollIndex, modelListActive);
 }

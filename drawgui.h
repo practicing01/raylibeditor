@@ -9,5 +9,6 @@ GuiFileDialogState fileDialogState;
 char fileNameToLoad[512];
 
 void DrawGui();
+void GetModelNames(char *curDir);
 
 #endif

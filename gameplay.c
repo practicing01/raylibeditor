@@ -3,6 +3,7 @@
 #include "raylibeditor.h"
 #include "gameplay.h"
 #include "drawgui.h"
+#include <string.h>
 
 void GameplayInit()
 {
@@ -16,6 +17,12 @@ void GameplayInit()
 	GuiLoadStyleDefault();
 	GuiSetStyle(LISTVIEW, LIST_ITEMS_HEIGHT, 24);
 	GuiSetStyle(LISTVIEW, SCROLLBAR_WIDTH, 12);
+	
+	const char *workDir = GetWorkingDirectory();
+	char curDir[1024];
+	strcpy(curDir, workDir );
+	strcat(curDir, "/models");
+	GetModelNames(curDir);
 }
 
 void GameplayExit()
