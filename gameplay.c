@@ -18,6 +18,7 @@ void GameplayInit()
 	GuiSetStyle(LISTVIEW, LIST_ITEMS_HEIGHT, 24);
 	GuiSetStyle(LISTVIEW, SCROLLBAR_WIDTH, 12);
 	
+	modelCount = 0;
 	const char *workDir = GetWorkingDirectory();
 	char curDir[1024];
 	strcpy(curDir, workDir );

@@ -117,20 +117,21 @@ bool nodeTypeEditMode = false;
 int modelListActive = -1;
 int modeListScrollIndex = 0;
 
+char modelFiles[1024][1024];
+char modelFileNames[1024][1024];
+const char *modelFilesPtr[1024];
+
 void GetModelNames(char *curDir)
 {
-	int dirFilesCount = 0;
-    char **files = GetDirectoryFiles(curDir, &dirFilesCount);
+	int fileCount = 0;
+    char **files = GetDirectoryFiles(curDir, &fileCount);
     
-    for (int x = 0; x < dirFilesCount; x++)
+    for (int x = 0; x < fileCount; x++)
     {
 		char filePath[1024];
 		strcpy(filePath, curDir );
 		strcat(filePath, "/");
 		strcat(filePath, files[x]);
-		
-		TraceLog(LOG_INFO, files[x]);
-		TraceLog(LOG_INFO, filePath);
 		
 		if (DirectoryExists(filePath))
 		{
@@ -141,9 +142,15 @@ void GetModelNames(char *curDir)
 		}
 		else//not a directory
 		{
-			if (FileExists(filePath))
+			if (FileExists(filePath) && IsFileExtension(files[x], ".glb"))
 			{
-				TraceLog(LOG_INFO, "file exists");
+				TraceLog(LOG_INFO, files[x]);
+				
+				strcpy(modelFiles[modelCount], filePath);
+				strcpy(modelFileNames[modelCount], GetFileNameWithoutExt(filePath));
+				modelFilesPtr[modelCount] = modelFileNames[modelCount];
+				
+				modelCount++;
 			}
 		}
 	}
@@ -221,5 +228,5 @@ void DrawGui()
     &nodeTypeActive, nodeTypeEditMode)) nodeTypeEditMode = !nodeTypeEditMode;
     
     //models list
-    modelListActive = GuiListView((Rectangle){ 0, SCREEN_HEIGHT/2, 180, 384 }, "Charmander;Bulbasaur;#18#Squirtel;Pikachu;Eevee;Pidgey", &modeListScrollIndex, modelListActive);
+    modelListActive = GuiListViewEx((Rectangle){ 0, SCREEN_HEIGHT/2, 180, 384 }, modelFilesPtr, modelCount, NULL, &modeListScrollIndex, modelListActive);
 }
