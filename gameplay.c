@@ -4,6 +4,33 @@
 #include "gameplay.h"
 #include "drawgui.h"
 #include <string.h>
+#include "drawnodes.h"
+
+void UpdateGuiValues()
+{
+	if(IsKeyReleased(KEY_ENTER))
+	{
+		PLAYER_MOVEMENT_SENSITIVITY = genProp[1].value.vfloat.val;
+		drawNodesCam.target = (Vector3){ 0.0f, 0.0f, 0.0f };
+	}
+}
+
+void ToggleCursor()
+{
+	if(IsKeyReleased(KEY_SPACE))
+	{
+		if (IsCursorHidden())
+		{
+			EnableCursor();
+		}
+		else
+		{//neither work for stopping the camera from jerking off. maybe i'm doing something wrong...
+			DisableCursor();
+			//previousMousePosition = GetMousePosition();
+			//SetMousePosition(previousMousePosition.x, previousMousePosition.y);
+		}
+	}
+}
 
 void GameplayInit()
 {
@@ -24,6 +51,17 @@ void GameplayInit()
 	strcpy(curDir, workDir );
 	strcat(curDir, "/models");
 	GetModelNames(curDir);
+	
+	drawNodesCam.position = (Vector3){ 0.0f, 10.0f, 10.0f };
+    drawNodesCam.target = (Vector3){ 0.0f, 0.0f, 0.0f };
+    drawNodesCam.up = (Vector3){ 0.0f, 1.0f, 0.0f };
+    drawNodesCam.fovy = 45.0f;
+    drawNodesCam.type = CAMERA_PERSPECTIVE;
+    
+    SetCameraModeEditor(drawNodesCam, CAMERA_FIRST_PERSON);
+    
+    SetCameraMoveControls(KEY_W, KEY_S, KEY_D, KEY_A, KEY_E, KEY_Q);
+    PLAYER_MOVEMENT_SENSITIVITY = 1.0;
 }
 
 void GameplayExit()
@@ -33,9 +71,20 @@ void GameplayExit()
 
 void GameplayLoop()
 {
+	ToggleCursor();
+	
+	UpdateGuiValues();
+	
+	if (IsCursorHidden())
+	{
+		UpdateEditorCamera(&drawNodesCam);
+		//UpdateEditorCameraCustom(&drawNodesCam);
+	}
+	
 	BeginDrawing();
 		ClearBackground(RAYWHITE);
-		//DrawText("GameplayLoop", 190, 200, 20, LIGHTGRAY);
+		
+		DrawNodes();
 		
 		DrawGui();
             

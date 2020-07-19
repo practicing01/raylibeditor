@@ -8,5 +8,7 @@
 void GameplayInit();
 void GameplayExit();
 void GameplayLoop();
+void UpdateGuiValues();
+void ToggleCursor();
 
 #endif

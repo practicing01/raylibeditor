@@ -68,7 +68,7 @@ int main(void)
     
     //enum ModulePhase phase = SPLASH;
 
-    InitWindow(defaultRes.x, defaultRes.y, "raylibtest");
+    InitWindow(defaultRes.x, defaultRes.y, "raylibeditor");
 
     SetTargetFPS(30);               // Set our game to run at 30 frames-per-second
     

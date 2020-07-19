@@ -4,10 +4,13 @@
 #include "raylib.h"
 #include "../raygui-master/src/raygui.h"
 #include "../raygui-master/examples/custom_file_dialog/gui_file_dialog.h"
+#include "../raygui-master/examples/property_list/dm_property_list.h"
 
 GuiFileDialogState fileDialogState;
 char fileNameToLoad[512];
 int modelCount;
+
+extern GuiDMProperty genProp[];
 
 void DrawGui();
 void GetModelNames(char *curDir);

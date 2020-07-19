@@ -144,7 +144,7 @@ void GetModelNames(char *curDir)
 		{
 			if (FileExists(filePath) && IsFileExtension(files[x], ".glb"))
 			{
-				TraceLog(LOG_INFO, files[x]);
+				//TraceLog(LOG_INFO, files[x]);
 				
 				strcpy(modelFiles[modelCount], filePath);
 				strcpy(modelFileNames[modelCount], GetFileNameWithoutExt(filePath));
@@ -224,7 +224,7 @@ void DrawGui()
 		
     //new object type
     if (GuiDropdownBox((Rectangle){ 265,0, 125, 30 },
-    "node;model;spawn",
+    "node;model;spawn;sfx;gfx;sprite;terrain;camera",
     &nodeTypeActive, nodeTypeEditMode)) nodeTypeEditMode = !nodeTypeEditMode;
     
     //models list
