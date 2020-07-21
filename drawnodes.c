@@ -4,6 +4,7 @@
 #include "drawnodes.h"
 #include <math.h>
 #include "raymath.h"
+#include "gameplay.h"
 
 void DrawNodes()
 {
@@ -63,16 +64,16 @@ void UpdateEditorCamera(Camera3D *camera)
 	camera->position.x += (sinf(EDITORCAMERA.angle.x)*direction[MOVE_BACK] -
 						   sinf(EDITORCAMERA.angle.x)*direction[MOVE_FRONT] -
 						   cosf(EDITORCAMERA.angle.x)*direction[MOVE_LEFT] +
-						   cosf(EDITORCAMERA.angle.x)*direction[MOVE_RIGHT])*PLAYER_MOVEMENT_SENSITIVITY;
+						   cosf(EDITORCAMERA.angle.x)*direction[MOVE_RIGHT])*genProps.camSpeed;
 	
 	camera->position.y += (sinf(EDITORCAMERA.angle.z)*direction[MOVE_FRONT] -
 						   sinf(EDITORCAMERA.angle.z)*direction[MOVE_BACK] +
-						   1.0f*direction[MOVE_UP] - 1.0f*direction[MOVE_DOWN])*PLAYER_MOVEMENT_SENSITIVITY;
+						   1.0f*direction[MOVE_UP] - 1.0f*direction[MOVE_DOWN])*genProps.camSpeed;
 	
 	camera->position.z += (cosf(EDITORCAMERA.angle.x)*direction[MOVE_BACK] -
 						   cosf(EDITORCAMERA.angle.x)*direction[MOVE_FRONT] +
 						   sinf(EDITORCAMERA.angle.x)*direction[MOVE_LEFT] -
-						   sinf(EDITORCAMERA.angle.x)*direction[MOVE_RIGHT])*PLAYER_MOVEMENT_SENSITIVITY;
+						   sinf(EDITORCAMERA.angle.x)*direction[MOVE_RIGHT])*genProps.camSpeed;
 	
 	// Camera orientation calculation
 	EDITORCAMERA.angle.x += (mousePositionDelta.x*-CAMERA_MOUSE_MOVE_SENSITIVITY);

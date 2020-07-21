@@ -11,6 +11,7 @@ char fileNameToLoad[512];
 int modelCount;
 
 extern GuiDMProperty genProp[];
+extern GuiDMProperty selProp[];
 
 void DrawGui();
 void GetModelNames(char *curDir);
