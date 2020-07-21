@@ -81,6 +81,10 @@ void removeNodeProps(struct nodeProperties* node)
 			free(curNode);
 			break;
 		}
+		else
+		{
+			curNode = (*curNode).next;
+		}
 	}
 }
 
