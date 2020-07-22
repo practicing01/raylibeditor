@@ -11,8 +11,10 @@ void GameplayLoop();
 void UpdateGuiValues();
 void ToggleCursor();
 
-enum NodeType {NODE, MODEL};
+enum NodeType {NODE = 0, MODEL, SPAWN, SFX, GFX, SPRITE, TERRAIN, CAMERA};
 enum ColShape {SPHERE, BOX};
+
+void AddNode();
 
 struct generalProperties
 {
@@ -37,9 +39,10 @@ struct nodeProperties
 struct nodeProperties *nodePropListStart;
 struct nodeProperties *nodePropListEnd;
 
-struct nodeProperties* addNodeProps(enum NodeType);
-void removeNodeProps(struct nodeProperties*);
-void freeNodePropsList();
+struct nodeProperties* AddNodeProps(enum NodeType);
+void FreeNodeData(struct nodeProperties*);
+void RemoveNodeProps(struct nodeProperties*);
+void FreeNodePropsList();
 
 struct nodeTypeData
 {

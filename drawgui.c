@@ -2,6 +2,7 @@
 #include "drawgui.h"
 #include "moduleLoop.h"
 #include <string.h>
+#include "gameplay.h"
 
 #define RAYGUI_IMPLEMENTATION
 #define RAYGUI_SUPPORT_ICONS
@@ -206,9 +207,9 @@ void DrawGui()
 		DrawRectangleLines( addNodeRect.x, addNodeRect.y,
 		addNodeRect.width, addNodeRect.height, RED);
 		
-		if (IsMouseButtonDown(MOUSE_LEFT_BUTTON))
+		if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON))
 		{
-			//add node here
+			AddNode();
 		};
 	}
 	else

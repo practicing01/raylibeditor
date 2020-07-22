@@ -15,6 +15,21 @@ void DrawNodes()
 	DrawCube(cubePosition, 2.0f, 2.0f, 2.0f, RED);
 	DrawGrid(1000, 1.0f);
 	
+	struct nodeProperties *curNode;
+	struct nodeProperties *nextNode;
+	curNode = nodePropListStart;
+	
+	while (curNode != NULL)
+	{
+		if ((*curNode).nodeType == NODE)
+		{
+			struct nodeTypeData *data = (struct nodeTypeData*)( (*curNode).nodeData );
+			DrawCube((*data).loc, 2.0f, 2.0f, 2.0f, RED);
+		}
+		
+		curNode = (*curNode).next;
+	}
+	
 	EndMode3D();
 	
 }

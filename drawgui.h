@@ -9,6 +9,7 @@
 GuiFileDialogState fileDialogState;
 char fileNameToLoad[512];
 int modelCount;
+extern int nodeTypeActive;
 
 extern GuiDMProperty genProp[];
 extern GuiDMProperty selProp[];

@@ -6,11 +6,25 @@
 #include <string.h>
 #include "drawnodes.h"
 
-struct nodeProperties* addNodeProps(enum NodeType nodeType)
+void AddNode()
+{
+	struct nodeProperties *node = AddNodeProps(nodeTypeActive);
+	
+	if (nodeTypeActive == NODE)
+	{
+		struct nodeTypeData *data = (struct nodeTypeData*)( (*node).nodeData );
+		(*data).loc = drawNodesCam.position;
+	}
+	
+}
+
+struct nodeProperties* AddNodeProps(enum NodeType nodeType)
 {
 	struct nodeProperties *newNode;
 	
 	newNode = (struct nodeProperties *)malloc( sizeof(struct nodeProperties) );
+	
+	(*newNode).nodeType = nodeType;
 	
 	(*newNode).prev = NULL;
 	(*newNode).next = NULL;
@@ -39,7 +53,7 @@ struct nodeProperties* addNodeProps(enum NodeType nodeType)
 	return newNode;
 }
 
-void removeNodeProps(struct nodeProperties* node)
+void RemoveNodeProps(struct nodeProperties* node)
 {
 	struct nodeProperties *curNode;
 	curNode = nodePropListStart;
@@ -78,6 +92,7 @@ void removeNodeProps(struct nodeProperties* node)
 				}
 			}
 			
+			FreeNodeData(curNode);
 			free(curNode);
 			break;
 		}
@@ -88,7 +103,17 @@ void removeNodeProps(struct nodeProperties* node)
 	}
 }
 
-void freeNodePropsList()
+void FreeNodeData(struct nodeProperties *node)
+{
+	if ( (*node).nodeType == NODE )
+	{
+		//free model etc
+	}
+	
+	free( (*node).nodeData );
+}
+
+void FreeNodePropsList()
 {
 	struct nodeProperties *curNode;
 	struct nodeProperties *nextNode;
@@ -96,10 +121,9 @@ void freeNodePropsList()
 	
 	while (curNode != NULL)
 	{
-		free( (*curNode).nodeData );
-		
 		nextNode = (*curNode).next;
 		
+		FreeNodeData(curNode);
 		free(curNode);
 		
 		curNode = nextNode;
@@ -132,17 +156,17 @@ void UpdateGuiValues()
 
 void ToggleCursor()
 {
-	if(IsKeyReleased(KEY_SPACE))
+	if(IsMouseButtonReleased(MOUSE_RIGHT_BUTTON))
 	{
 		if (IsCursorHidden())
 		{
 			EnableCursor();
+			previousMousePosition = GetMousePosition();
 		}
 		else
-		{//neither work for stopping the camera from jerking off. maybe i'm doing something wrong...
+		{
 			DisableCursor();
-			//previousMousePosition = GetMousePosition();
-			//SetMousePosition(previousMousePosition.x, previousMousePosition.y);
+			SetMousePosition(previousMousePosition.x, previousMousePosition.y);
 		}
 	}
 }
@@ -200,7 +224,7 @@ void GameplayInit()
 
 void GameplayExit()
 {
-	freeNodePropsList();
+	FreeNodePropsList();
 }
 
 void GameplayLoop()
