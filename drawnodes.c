@@ -12,7 +12,7 @@ void DrawNodes()
 	
 	BeginMode3D(drawNodesCam);
 	
-	DrawCube(cubePosition, 2.0f, 2.0f, 2.0f, RED);
+	DrawCube(cubePosition, 1.0f, 1.0f, 1.0f, RED);
 	DrawGrid(1000, 1.0f);
 	
 	struct nodeProperties *curNode;
@@ -24,7 +24,12 @@ void DrawNodes()
 		if ((*curNode).nodeType == NODE)
 		{
 			struct nodeTypeData *data = (struct nodeTypeData*)( (*curNode).nodeData );
-			DrawCube((*data).loc, 2.0f, 2.0f, 2.0f, RED);
+			DrawCube((*data).loc, 1.0f, 1.0f, 1.0f, RED);
+		}
+		else if ((*curNode).nodeType == MODEL)
+		{
+			struct modelTypeData *data = (struct modelTypeData*)( (*curNode).nodeData );
+			DrawModel( (*data).model, (*data).nodeProps.loc, 1.0f, WHITE);
 		}
 		
 		curNode = (*curNode).next;
@@ -52,6 +57,7 @@ void SetCameraModeEditor(Camera camera, int mode)
     EDITORCAMERA.playerEyesPosition = camera.position.y;          // Init player eyes position to camera Y position
 
     // Lock cursor for first person and third person cameras
+    previousMousePosition = GetMousePosition();
     if ((mode == CAMERA_FIRST_PERSON) || (mode == CAMERA_THIRD_PERSON)) DisableCursor();
     else EnableCursor();
 

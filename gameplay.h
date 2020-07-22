@@ -62,6 +62,7 @@ struct modelTypeData
 {
 	struct nodeTypeData nodeProps;
 	char filepath[1024];
+	Model model;
 	bool animated;
 	Vector2 frames;
 };

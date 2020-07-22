@@ -15,6 +15,18 @@ void AddNode()
 		struct nodeTypeData *data = (struct nodeTypeData*)( (*node).nodeData );
 		(*data).loc = drawNodesCam.position;
 	}
+	else if (nodeTypeActive == MODEL)
+	{
+		if (modelListActive != -1)
+		{
+			struct modelTypeData *data = (struct modelTypeData*)( (*node).nodeData );
+			(*data).nodeProps.loc = drawNodesCam.position;
+			
+			strcpy((*data).filepath, modelFiles[modelListActive]);
+			
+			(*data).model = LoadModel(modelFiles[modelListActive]);
+		}
+	}
 	
 }
 
@@ -107,7 +119,12 @@ void FreeNodeData(struct nodeProperties *node)
 {
 	if ( (*node).nodeType == NODE )
 	{
-		//free model etc
+		//free data
+	}
+	else if ((*node).nodeType == MODEL)
+	{
+		struct modelTypeData *data = (struct modelTypeData*)( (*node).nodeData );
+		UnloadModel((*data).model);
 	}
 	
 	free( (*node).nodeData );
@@ -229,6 +246,11 @@ void GameplayExit()
 
 void GameplayLoop()
 {
+	if(IsKeyReleased(KEY_SPACE))
+	{
+		AddNode();
+	}
+	
 	ToggleCursor();
 	
 	UpdateGuiValues();
