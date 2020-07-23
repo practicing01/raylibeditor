@@ -22,8 +22,22 @@ void AddNode()
 			struct modelTypeData *data = (struct modelTypeData*)( (*node).nodeData );
 			(*data).nodeProps.loc = drawNodesCam.position;
 			
-			strcpy((*data).filepath, modelFiles[modelListActive]);
+			//TraceLog(LOG_INFO, GetWorkingDirectory());
+			const char *workDir = GetWorkingDirectory();
+			int workDirLen = strlen(workDir);
+			char *offset = strstr(modelFiles[modelListActive], workDir);
 			
+			if (offset != NULL)
+			{
+				strcpy((*data).filepath, offset + workDirLen + 1);//chop off home path
+			}
+			else
+			{
+				strcpy((*data).filepath, modelFiles[modelListActive]);
+			}
+			
+			TraceLog(LOG_INFO, (*data).filepath);
+						
 			(*data).model = LoadModel(modelFiles[modelListActive]);
 		}
 	}
