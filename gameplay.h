@@ -82,5 +82,14 @@ struct selectedNode *selectedNodesListStart, *selectedNodesListEnd;
 void AddSelectedNode(struct nodeProperties* node);
 void RemoveSelectedNode(struct nodeProperties *node);
 void FreeSelectedList();
+void ApplyFuncToList( void (*fun)(struct selectedNode *node, void *param), void *param );
+
+void TransformNodes();
+void TranslateNode(struct selectedNode *node, void *dir);
+void RotateNode(struct selectedNode *node, void *dir);
+void ScaleNode(struct selectedNode *node, void *dir);
+float transformElapsedTime;
+float transformInterval;
+bool canTransform;
 
 #endif

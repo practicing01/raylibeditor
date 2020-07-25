@@ -7,6 +7,163 @@
 #include "drawnodes.h"
 #include "raymath.h"
 
+void TranslateNode(struct selectedNode *node, void *param)
+{
+	struct nodeProperties *nodeProps = (*node).node;
+	Vector3 dir = *( (Vector3*) param);
+	Vector3 offset = Vector3Multiply(genProps.locInt, dir);
+	
+	(*nodeProps).loc = Vector3Add((*nodeProps).loc, offset);
+}
+
+void ApplyFuncToList( void (*fun)(struct selectedNode *node, void *param), void *param )
+{
+	struct selectedNode *curNode;
+	curNode = selectedNodesListStart;
+	
+	while (curNode != NULL)
+	{
+		fun(curNode, param);
+		
+		curNode = (*curNode).next;
+	}
+}
+
+void TransformNodes()
+{
+	transformElapsedTime += dt.deltaTime;
+	
+	if (transformElapsedTime >= transformInterval)
+	{
+		transformElapsedTime = 0.0f;
+		canTransform = true;
+	}
+	
+	if (!canTransform)
+	{
+		return;
+	}
+	
+	Vector3 dir = (Vector3){ 0.0f, 0.0f, 0.0f };
+	
+	if ( IsKeyDown(KEY_U) )//+Z
+	{
+		canTransform = false;
+		
+		dir.z = 1.0f;
+		
+		if( IsKeyDown(KEY_LEFT_CONTROL) )//scale
+		{
+			//
+		}
+		else if( IsKeyDown(KEY_LEFT_SHIFT) )//rotate
+		{
+			//
+		}
+		else//translate
+		{
+			ApplyFuncToList( TranslateNode, &dir);
+		}
+	}
+	else if ( IsKeyDown(KEY_J) )//-Z
+	{
+		canTransform = false;
+		
+		dir.z = -1.0f;
+		
+		if( IsKeyDown(KEY_LEFT_CONTROL) )//scale
+		{
+			//
+		}
+		else if( IsKeyDown(KEY_LEFT_SHIFT) )//rotate
+		{
+			//
+		}
+		else//translate
+		{
+			ApplyFuncToList( TranslateNode, &dir);
+		}
+	}
+	
+	if ( IsKeyDown(KEY_K) )//+X
+	{
+		canTransform = false;
+		
+		dir.x = 1.0f;
+		
+		if( IsKeyDown(KEY_LEFT_CONTROL) )//scale
+		{
+			//
+		}
+		else if( IsKeyDown(KEY_LEFT_SHIFT) )//rotate
+		{
+			//
+		}
+		else//translate
+		{
+			ApplyFuncToList( TranslateNode, &dir);
+		}
+	}
+	else if ( IsKeyDown(KEY_H) )//-X
+	{
+		canTransform = false;
+		
+		dir.x = -1.0f;
+		
+		if( IsKeyDown(KEY_LEFT_CONTROL) )//scale
+		{
+			//
+		}
+		else if( IsKeyDown(KEY_LEFT_SHIFT) )//rotate
+		{
+			//
+		}
+		else//translate
+		{
+			ApplyFuncToList( TranslateNode, &dir);
+		}
+	}
+	
+	if ( IsKeyDown(KEY_I) )//+Y
+	{
+		canTransform = false;
+		
+		dir.y = 1.0f;
+		
+		if( IsKeyDown(KEY_LEFT_CONTROL) )//scale
+		{
+			//
+		}
+		else if( IsKeyDown(KEY_LEFT_SHIFT) )//rotate
+		{
+			//
+		}
+		else//translate
+		{
+			ApplyFuncToList( TranslateNode, &dir);
+		}
+	}
+	else if ( IsKeyDown(KEY_Y) )//-Y
+	{
+		canTransform = false;
+		
+		dir.y = -1.0f;
+		
+		if( IsKeyDown(KEY_LEFT_CONTROL) )//scale
+		{
+			//
+		}
+		else if( IsKeyDown(KEY_LEFT_SHIFT) )//rotate
+		{
+			//
+		}
+		else//translate
+		{
+			ApplyFuncToList( TranslateNode, &dir);
+		}
+	}
+}
+
 void SelectNode()
 {
 	if (IsCursorHidden()){return;}
@@ -413,22 +570,26 @@ void GameplayInit()
 		
 	genProps.camSpeed = 1.0;
 	
-	genProps.locInt.x = 0.0f;
-	genProps.locInt.y = 0.0f;
-	genProps.locInt.z = 0.0f;
+	genProps.locInt.x = 1.0f;
+	genProps.locInt.y = 1.0f;
+	genProps.locInt.z = 1.0f;
 	
-	genProps.rotInt.x = 0.0f;
-	genProps.rotInt.y = 0.0f;
-	genProps.rotInt.z = 0.0f;
+	genProps.rotInt.x = 1.0f;
+	genProps.rotInt.y = 1.0f;
+	genProps.rotInt.z = 1.0f;
 	
-	genProps.scaleInt.x = 0.0f;
-	genProps.scaleInt.y = 0.0f;
-	genProps.scaleInt.z = 0.0f;
+	genProps.scaleInt.x = 1.0f;
+	genProps.scaleInt.y = 1.0f;
+	genProps.scaleInt.z = 1.0f;
 	
 	nodePropListStart = NULL;
 	nodePropListEnd = NULL;
 	selectedNodesListStart = NULL;
 	selectedNodesListEnd = NULL;
+	
+	transformElapsedTime = 0.0f;
+	transformInterval = 0.25f;
+	canTransform = true;
 }
 
 void GameplayExit()
@@ -440,6 +601,8 @@ void GameplayExit()
 void GameplayLoop()
 {
 	SelectNode();
+	
+	TransformNodes();
 	
 	if(IsKeyReleased(KEY_SPACE))
 	{
