@@ -20,24 +20,13 @@ void SelectNode()
 		
 		bool hit = false;
 		
+		float radius = 1.0f;
 		Vector3 curLoc;
 		
 		while (curNode != NULL)
 		{
-			float radius;
-			
-			if ( (*curNode).nodeType == NODE)
-			{
-				struct nodeTypeData *data = (struct nodeTypeData*)( (*curNode).nodeData );
-				radius = (*data).colScale.x;
-				curLoc = (*data).loc;
-			}
-			else if ( (*curNode).nodeType == MODEL)
-			{
-				struct modelTypeData *data = (struct modelTypeData*)( (*curNode).nodeData );
-				radius = (*data).nodeProps.colScale.x;
-				curLoc = (*data).nodeProps.loc;
-			}
+			radius = (*curNode).colScale.x;
+			curLoc = (*curNode).loc;
 			
 			if ( CheckCollisionRaySphere( GetMouseRay(GetMousePosition(), drawNodesCam), curLoc, radius) )
 			{
@@ -165,36 +154,27 @@ void AddNode()
 	struct nodeProperties *node = AddNodeProps(nodeTypeActive);
 	
 	(*node).selected = false;
+	(*node).loc = drawNodesCam.position;
+	(*node).rot = Vector3Zero();
+	(*node).scale = Vector3One();
+	(*node).trigger = false;
+	(*node).colScale = Vector3One();
+	(*node).colShape = SPHERE;
+	(*node).colLayer = 0;
+	(*node).LayerCol = 0;
+	(*node).visible = true;
+	(*node).hidden = false;
 	
 	if (nodeTypeActive == NODE)
 	{
 		struct nodeTypeData *data = (struct nodeTypeData*)( (*node).nodeData );
-		(*data).loc = drawNodesCam.position;
-		(*data).rot = Vector3Zero();
-		(*data).scale = Vector3One();
-		(*data).trigger = false;
-		(*data).colScale = Vector3One();
-		(*data).colShape = SPHERE;
-		(*data).colLayer = 0;
-		(*data).LayerCol = 0;
-		(*data).visible = true;
-		(*data).hidden = false;
+		//
 	}
 	else if (nodeTypeActive == MODEL)
 	{
 		if (modelListActive != -1)
 		{
 			struct modelTypeData *data = (struct modelTypeData*)( (*node).nodeData );
-			(*data).nodeProps.loc = drawNodesCam.position;
-			(*data).nodeProps.rot = Vector3Zero();
-			(*data).nodeProps.scale = Vector3One();
-			(*data).nodeProps.trigger = false;
-			(*data).nodeProps.colScale = Vector3One();
-			(*data).nodeProps.colShape = SPHERE;
-			(*data).nodeProps.colLayer = 0;
-			(*data).nodeProps.LayerCol = 0;
-			(*data).nodeProps.visible = true;
-			(*data).nodeProps.hidden = false;
 			
 			//TraceLog(LOG_INFO, GetWorkingDirectory());
 			const char *workDir = GetWorkingDirectory();

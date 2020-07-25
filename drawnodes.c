@@ -28,15 +28,15 @@ void DrawNodes()
 			tint = LIME;
 		}
 		
-		if ((*curNode).nodeType == NODE)
+		if ( (*curNode).nodeType == NODE)
 		{
-			struct nodeTypeData *data = (struct nodeTypeData*)( (*curNode).nodeData );
-			DrawCube((*data).loc, 1.0f, 1.0f, 1.0f, tint);
+			//struct nodeTypeData *data = (struct nodeTypeData*)( (*curNode).nodeData );
+			DrawCube( (*curNode).loc, 1.0f, 1.0f, 1.0f, tint);
 		}
-		else if ((*curNode).nodeType == MODEL)
+		else if ( (*curNode).nodeType == MODEL)
 		{
 			struct modelTypeData *data = (struct modelTypeData*)( (*curNode).nodeData );
-			DrawModel( (*data).model, (*data).nodeProps.loc, 1.0f, tint);
+			DrawModel( (*data).model, (*curNode).loc, 1.0f, tint);
 		}
 		
 		curNode = (*curNode).next;

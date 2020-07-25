@@ -32,6 +32,17 @@ struct nodeProperties
 {
 	enum NodeType nodeType;
 	void *nodeData;
+	
+	Vector3 loc;
+	Vector3 rot;
+	Vector3 scale;
+	bool trigger;
+	enum ColShape colShape;
+	Vector3 colScale;
+	int colLayer;//node belongs to these layers.//1<<x = x position
+	int LayerCol;//node collides with these layers.
+	bool visible;
+	bool hidden;
 	bool selected;
 	
 	struct nodeProperties *prev;
@@ -48,21 +59,11 @@ void FreeNodePropsList();
 
 struct nodeTypeData
 {
-	Vector3 loc;
-	Vector3 rot;
-	Vector3 scale;
-	bool trigger;
-	enum ColShape colShape;
-	Vector3 colScale;
-	int colLayer;//node belongs to these layers.//1<<x = x position
-	int LayerCol;//node collides with these layers.
-	bool visible;
-	bool hidden;
+	//
 };
 
 struct modelTypeData
 {
-	struct nodeTypeData nodeProps;
 	char filepath[1024];
 	Model model;
 	bool animated;
