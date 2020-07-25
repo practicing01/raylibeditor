@@ -10,6 +10,7 @@ void GameplayExit();
 void GameplayLoop();
 void UpdateGuiValues();
 void ToggleCursor();
+void SelectNode();
 
 enum NodeType {NODE = 0, MODEL, SPAWN, SFX, GFX, SPRITE, TERRAIN, CAMERA};
 enum ColShape {SPHERE, BOX};
@@ -31,6 +32,7 @@ struct nodeProperties
 {
 	enum NodeType nodeType;
 	void *nodeData;
+	bool selected;
 	
 	struct nodeProperties *prev;
 	struct nodeProperties *next;
@@ -66,5 +68,18 @@ struct modelTypeData
 	bool animated;
 	Vector2 frames;
 };
+
+struct selectedNode
+{
+	struct nodeProperties *node;
+	
+	struct selectedNode *prev;
+	struct selectedNode *next;
+};
+
+struct selectedNode *selectedNodesListStart, *selectedNodesListEnd;
+void AddSelectedNode(struct nodeProperties* node);
+void RemoveSelectedNode(struct nodeProperties *node);
+void FreeSelectedList();
 
 #endif

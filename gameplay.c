@@ -5,15 +5,180 @@
 #include "drawgui.h"
 #include <string.h>
 #include "drawnodes.h"
+#include "raymath.h"
+
+void SelectNode()
+{
+	if (IsCursorHidden()){return;}
+	
+	if(IsMouseButtonReleased(MOUSE_LEFT_BUTTON))
+	{
+		struct nodeProperties *curNode, *closestNode;
+		curNode = nodePropListStart;
+		
+		float curDist = 1000.0f;
+		
+		bool hit = false;
+		
+		Vector3 curLoc;
+		
+		while (curNode != NULL)
+		{
+			float radius;
+			
+			if ( (*curNode).nodeType == NODE)
+			{
+				struct nodeTypeData *data = (struct nodeTypeData*)( (*curNode).nodeData );
+				radius = (*data).colScale.x;
+				curLoc = (*data).loc;
+			}
+			else if ( (*curNode).nodeType == MODEL)
+			{
+				struct modelTypeData *data = (struct modelTypeData*)( (*curNode).nodeData );
+				radius = (*data).nodeProps.colScale.x;
+				curLoc = (*data).nodeProps.loc;
+			}
+			
+			if ( CheckCollisionRaySphere( GetMouseRay(GetMousePosition(), drawNodesCam), curLoc, radius) )
+			{
+				hit = true;
+				
+				float dist = Vector3Distance(drawNodesCam.position, curLoc);
+				
+				if (dist < curDist)
+				{
+					curDist = dist;
+					closestNode = curNode;
+				}
+			}
+			
+			curNode = (*curNode).next;
+		}
+		
+		if (hit && closestNode != NULL)
+		{			
+			if(IsKeyDown(KEY_LEFT_CONTROL))//deselect
+			{
+				if ( (*closestNode).selected )
+				{
+					//remove from selection list
+					RemoveSelectedNode(closestNode);
+				}
+			}
+			else if(IsKeyDown(KEY_LEFT_SHIFT))//add
+			{
+				if ( (*closestNode).selected == false)
+				{
+					//add to selection list
+					AddSelectedNode(closestNode);
+				}
+			}
+			else
+			{
+				//clear selection list and add
+				FreeSelectedList();
+				AddSelectedNode(closestNode);
+			}
+		}
+	}
+}
+
+void AddSelectedNode(struct nodeProperties* node)
+{
+	(*node).selected = true;
+	
+	struct selectedNode *newNode;
+	
+	newNode = (struct selectedNode *)malloc( sizeof(struct selectedNode) );
+	
+	(*newNode).node = node;
+	
+	(*newNode).prev = NULL;
+	(*newNode).next = NULL;
+	
+	if (selectedNodesListStart == NULL)
+	{
+		selectedNodesListStart = newNode;
+		selectedNodesListEnd = newNode;
+	}
+	else
+	{
+		(*selectedNodesListEnd).next = newNode;
+		(*newNode).prev = selectedNodesListEnd;
+		selectedNodesListEnd = newNode;
+	}
+}
+
+void RemoveSelectedNode(struct nodeProperties *node)
+{
+	(*node).selected = false;
+	
+	struct selectedNode *curNode;
+	curNode = selectedNodesListStart;
+	
+	while (curNode != NULL)
+	{
+		if ( (*curNode).node == node)
+		{
+			if ( (*curNode).prev != NULL )
+			{
+				if ( (*curNode).next != NULL )
+				{
+					struct selectedNode *prevNode = (*curNode).prev;
+					struct selectedNode *nextNode = (*curNode).next;
+					(*prevNode).next = nextNode;
+					(*nextNode).prev = prevNode;
+				}
+				else//this was the end node
+				{
+					struct selectedNode *prevNode = (*curNode).prev;
+					(*prevNode).next = NULL;
+					selectedNodesListEnd = prevNode;
+				}
+			}
+			else//this was the start node
+			{
+				if ( (*curNode).next != NULL )
+				{
+					selectedNodesListStart = (*curNode).next;
+					(*selectedNodesListStart).prev = NULL;
+				}
+				else//this was both start and end
+				{
+					selectedNodesListStart = NULL;
+					selectedNodesListEnd = NULL;
+				}
+			}
+			
+			free(curNode);
+			break;
+		}
+		else
+		{
+			curNode = (*curNode).next;
+		}
+	}
+}
 
 void AddNode()
 {
 	struct nodeProperties *node = AddNodeProps(nodeTypeActive);
 	
+	(*node).selected = false;
+	
 	if (nodeTypeActive == NODE)
 	{
 		struct nodeTypeData *data = (struct nodeTypeData*)( (*node).nodeData );
 		(*data).loc = drawNodesCam.position;
+		(*data).rot = Vector3Zero();
+		(*data).scale = Vector3One();
+		(*data).trigger = false;
+		(*data).colScale = Vector3One();
+		(*data).colShape = SPHERE;
+		(*data).colLayer = 0;
+		(*data).LayerCol = 0;
+		(*data).visible = true;
+		(*data).hidden = false;
 	}
 	else if (nodeTypeActive == MODEL)
 	{
@@ -21,6 +186,15 @@ void AddNode()
 		{
 			struct modelTypeData *data = (struct modelTypeData*)( (*node).nodeData );
 			(*data).nodeProps.loc = drawNodesCam.position;
+			(*data).nodeProps.rot = Vector3Zero();
+			(*data).nodeProps.scale = Vector3One();
+			(*data).nodeProps.trigger = false;
+			(*data).nodeProps.colScale = Vector3One();
+			(*data).nodeProps.colShape = SPHERE;
+			(*data).nodeProps.colLayer = 0;
+			(*data).nodeProps.LayerCol = 0;
+			(*data).nodeProps.visible = true;
+			(*data).nodeProps.hidden = false;
 			
 			//TraceLog(LOG_INFO, GetWorkingDirectory());
 			const char *workDir = GetWorkingDirectory();
@@ -161,6 +335,28 @@ void FreeNodePropsList()
 	}
 }
 
+void FreeSelectedList()
+{
+	struct selectedNode *curNode;
+	struct selectedNode *nextNode;
+	curNode = selectedNodesListStart;
+	
+	while (curNode != NULL)
+	{
+		struct nodeProperties *node = (*curNode).node;
+		(*node).selected = false;
+		
+		nextNode = (*curNode).next;
+		
+		free(curNode);
+		
+		curNode = nextNode;
+	}
+	
+	selectedNodesListStart = NULL;
+	selectedNodesListEnd = NULL;
+}
+
 void UpdateGuiValues()
 {
 	if(IsKeyReleased(KEY_ENTER))
@@ -251,15 +447,20 @@ void GameplayInit()
 	
 	nodePropListStart = NULL;
 	nodePropListEnd = NULL;
+	selectedNodesListStart = NULL;
+	selectedNodesListEnd = NULL;
 }
 
 void GameplayExit()
 {
 	FreeNodePropsList();
+	FreeSelectedList();
 }
 
 void GameplayLoop()
 {
+	SelectNode();
+	
 	if(IsKeyReleased(KEY_SPACE))
 	{
 		AddNode();

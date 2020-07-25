@@ -21,15 +21,22 @@ void DrawNodes()
 	
 	while (curNode != NULL)
 	{
+		Color tint = WHITE;
+		
+		if ( (*curNode).selected)
+		{
+			tint = LIME;
+		}
+		
 		if ((*curNode).nodeType == NODE)
 		{
 			struct nodeTypeData *data = (struct nodeTypeData*)( (*curNode).nodeData );
-			DrawCube((*data).loc, 1.0f, 1.0f, 1.0f, RED);
+			DrawCube((*data).loc, 1.0f, 1.0f, 1.0f, tint);
 		}
 		else if ((*curNode).nodeType == MODEL)
 		{
 			struct modelTypeData *data = (struct modelTypeData*)( (*curNode).nodeData );
-			DrawModel( (*data).model, (*data).nodeProps.loc, 1.0f, WHITE);
+			DrawModel( (*data).model, (*data).nodeProps.loc, 1.0f, tint);
 		}
 		
 		curNode = (*curNode).next;

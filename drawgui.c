@@ -32,8 +32,8 @@ int genPropFocus = 0, genPropScroll = 0;
 //selection properties list
 GuiDMProperty selProp[] = {
 	PSECTION("#102#Transform", 1, 3),
-	PVEC3("Loc", 0, 1.0, 1.0, 1.0),
-	PVEC3("Rot", 0, 1.0, 1.0, 1.0),
+	PVEC3("Loc", 0, 0.0, 0.0, 0.0),
+	PVEC3("Rot", 0, 0.0, 0.0, 0.0),
 	PVEC3("Scale", 0, 1.0, 1.0, 1.0),
 	PSECTION("#102#Col", 1, 3),
 	PBOOL("Trigger", 0, false),
