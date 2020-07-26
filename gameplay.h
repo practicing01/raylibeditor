@@ -13,7 +13,7 @@ void ToggleCursor();
 void SelectNode();
 
 enum NodeType {NODE = 0, MODEL, SPAWN, SFX, GFX, SPRITE, TERRAIN, CAMERA};
-enum ColShape {SPHERE, BOX};
+enum ColShape {SPHERE = 0, BOX};
 
 void AddNode();
 
@@ -83,11 +83,13 @@ void AddSelectedNode(struct nodeProperties* node);
 void RemoveSelectedNode(struct nodeProperties *node);
 void FreeSelectedList();
 void ApplyFuncToList( void (*fun)(struct selectedNode *node, void *param), void *param );
+void PopulateSelectionProps(struct nodeProperties *node);
 
 void TransformNodes();
-void TranslateNode(struct selectedNode *node, void *dir);
-void RotateNode(struct selectedNode *node, void *dir);
-void ScaleNode(struct selectedNode *node, void *dir);
+void ApplyTransform(struct selectedNode *node, void *param);
+void TranslateNode(struct selectedNode *node, void *param);
+void RotateNode(struct selectedNode *node, void *param);
+void ScaleNode(struct selectedNode *node, void *param);
 float transformElapsedTime;
 float transformInterval;
 bool canTransform;

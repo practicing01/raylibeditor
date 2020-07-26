@@ -7,6 +7,103 @@
 #include "drawnodes.h"
 #include "raymath.h"
 
+void PopulateSelectionProps(struct nodeProperties *node)
+{
+	selProp[1].value.v3.x = (*node).loc.x;
+	selProp[1].value.v3.y = (*node).loc.y;
+	selProp[1].value.v3.z = (*node).loc.z;
+	
+	selProp[2].value.v3.x = (*node).rot.x;
+	selProp[2].value.v3.y = (*node).rot.y;
+	selProp[2].value.v3.z = (*node).rot.z;
+	
+	selProp[3].value.v3.x = (*node).scale.x;
+	selProp[3].value.v3.y = (*node).scale.y;
+	selProp[3].value.v3.z = (*node).scale.z;
+	
+	selProp[5].value.vbool = (*node).trigger;
+	
+	selProp[6].value.vselect.active = (*node).colShape;
+	
+	selProp[7].value.v3.x = (*node).colScale.x;
+	selProp[7].value.v3.y = (*node).colScale.y;
+	selProp[7].value.v3.z = (*node).colScale.z;
+	
+	for (int x = 0; x < 32; x++)
+	{
+		selProp[9 + x].value.vbool = ( (*node).colLayer ) & ( 1 << x );
+	}
+	
+	for (int x = 0; x < 32; x++)
+	{
+		selProp[42 + x].value.vbool = ( (*node).LayerCol ) & ( 1 << x );
+	}
+	
+	if ( (*node).nodeType == MODEL)
+	{
+		struct modelTypeData *data = (*node).nodeData;
+		
+		selProp[75].value.vbool = (*data).animated;
+		
+		selProp[76].value.v2.x = (*data).frames.x;
+		selProp[76].value.v2.y = (*data).frames.y;
+	}
+	
+	selProp[77].value.vbool = (*node).visible;
+	
+	selProp[78].value.vbool = (*node).hidden;
+	
+}
+
+void ApplyTransform(struct selectedNode *node, void *param)
+{
+	struct nodeProperties *nodeProps = (*node).node;
+	
+	(*nodeProps).loc.x = selProp[1].value.v3.x;
+	(*nodeProps).loc.y = selProp[1].value.v3.y;
+	(*nodeProps).loc.z = selProp[1].value.v3.z;
+	
+	(*nodeProps).rot.x = selProp[2].value.v3.x;
+	(*nodeProps).rot.y = selProp[2].value.v3.y;
+	(*nodeProps).rot.z = selProp[2].value.v3.z;
+	
+	(*nodeProps).scale.x = selProp[3].value.v3.x;
+	(*nodeProps).scale.y = selProp[3].value.v3.y;
+	(*nodeProps).scale.z = selProp[3].value.v3.z;
+	
+	(*nodeProps).trigger = selProp[5].value.vbool;
+	
+	(*nodeProps).colShape = selProp[6].value.vselect.active;
+	
+	(*nodeProps).colScale.x = selProp[7].value.v3.x;
+	(*nodeProps).colScale.y = selProp[7].value.v3.y;
+	(*nodeProps).colScale.z = selProp[7].value.v3.z;
+	
+	for (int x = 0; x < 32; x++)
+	{
+		(*nodeProps).colLayer |= ( ( selProp[9 + x].value.vbool ) << x );
+	}
+	
+	for (int x = 0; x < 32; x++)
+	{
+		(*nodeProps).LayerCol |= ( ( selProp[42 + x].value.vbool ) << x );
+	}
+	
+	if ( (*nodeProps).nodeType == MODEL)
+	{
+		struct modelTypeData *data = (*nodeProps).nodeData;
+		
+		(*data).animated = selProp[75].value.vbool;
+		
+		(*data).frames.x = selProp[76].value.v2.x;
+		(*data).frames.y = selProp[76].value.v2.y;
+	}
+	
+	(*nodeProps).visible = selProp[77].value.vbool;
+	
+	(*nodeProps).hidden = selProp[78].value.vbool;
+}
+
 void TranslateNode(struct selectedNode *node, void *param)
 {
 	struct nodeProperties *nodeProps = (*node).node;
@@ -31,6 +128,15 @@ void ApplyFuncToList( void (*fun)(struct selectedNode *node, void *param), void 
 
 void TransformNodes()
 {
+	if(IsKeyReleased(KEY_ENTER))
+	{
+		if( IsKeyDown(KEY_LEFT_SHIFT) )
+		{
+			ApplyFuncToList( ApplyTransform, NULL);
+			return;
+		}
+	}
+	
 	transformElapsedTime += dt.deltaTime;
 	
 	if (transformElapsedTime >= transformInterval)
@@ -170,6 +276,12 @@ void SelectNode()
 	
 	if(IsMouseButtonReleased(MOUSE_LEFT_BUTTON))
 	{
+		if(IsKeyDown(KEY_CAPS_LOCK))
+		{
+			FreeSelectedList();
+			return;
+		}
+		
 		struct nodeProperties *curNode, *closestNode;
 		curNode = nodePropListStart;
 		
@@ -224,6 +336,8 @@ void SelectNode()
 				//clear selection list and add
 				FreeSelectedList();
 				AddSelectedNode(closestNode);
+				//populate selection properties
+				PopulateSelectionProps(closestNode);
 			}
 		}
 	}
@@ -350,6 +464,9 @@ void AddNode()
 			TraceLog(LOG_INFO, (*data).filepath);
 						
 			(*data).model = LoadModel(modelFiles[modelListActive]);
+			
+			(*data).animated = false;
+			(*data).frames = Vector2Zero();
 		}
 	}
 	
