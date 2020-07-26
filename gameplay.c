@@ -7,6 +7,17 @@
 #include "drawnodes.h"
 #include "raymath.h"
 
+void DuplicateSelection()
+{
+	if ( IsKeyReleased(KEY_V) )
+	{
+		if( IsKeyDown(KEY_LEFT_CONTROL) )
+		{
+			//
+		}
+	}
+}
+
 void PopulateSelectionProps(struct nodeProperties *node)
 {
 	selProp[1].value.v3.x = (*node).loc.x;
@@ -179,38 +190,12 @@ void TransformNodes()
 		canTransform = false;
 		
 		dir.z = 1.0f;
-		
-		if( IsKeyDown(KEY_LEFT_CONTROL) )//scale
-		{
-			ApplyFuncToList( ScaleNode, &dir);
-		}
-		else if( IsKeyDown(KEY_LEFT_SHIFT) )//rotate
-		{
-			ApplyFuncToList( RotateNode, &dir);
-		}
-		else//translate
-		{
-			ApplyFuncToList( TranslateNode, &dir);
-		}
 	}
 	else if ( IsKeyDown(KEY_K) )//-Z
 	{
 		canTransform = false;
 		
 		dir.z = -1.0f;
-		
-		if( IsKeyDown(KEY_LEFT_CONTROL) )//scale
-		{
-			ApplyFuncToList( ScaleNode, &dir);
-		}
-		else if( IsKeyDown(KEY_LEFT_SHIFT) )//rotate
-		{
-			ApplyFuncToList( RotateNode, &dir);
-		}
-		else//translate
-		{
-			ApplyFuncToList( TranslateNode, &dir);
-		}
 	}
 	
 	if ( IsKeyDown(KEY_L) )//+X
@@ -218,38 +203,12 @@ void TransformNodes()
 		canTransform = false;
 		
 		dir.x = 1.0f;
-		
-		if( IsKeyDown(KEY_LEFT_CONTROL) )//scale
-		{
-			ApplyFuncToList( ScaleNode, &dir);
-		}
-		else if( IsKeyDown(KEY_LEFT_SHIFT) )//rotate
-		{
-			ApplyFuncToList( RotateNode, &dir);
-		}
-		else//translate
-		{
-			ApplyFuncToList( TranslateNode, &dir);
-		}
 	}
 	else if ( IsKeyDown(KEY_J) )//-X
 	{
 		canTransform = false;
 		
 		dir.x = -1.0f;
-		
-		if( IsKeyDown(KEY_LEFT_CONTROL) )//scale
-		{
-			ApplyFuncToList( ScaleNode, &dir);
-		}
-		else if( IsKeyDown(KEY_LEFT_SHIFT) )//rotate
-		{
-			ApplyFuncToList( RotateNode, &dir);
-		}
-		else//translate
-		{
-			ApplyFuncToList( TranslateNode, &dir);
-		}
 	}
 	
 	if ( IsKeyDown(KEY_O) )//+Y
@@ -257,26 +216,16 @@ void TransformNodes()
 		canTransform = false;
 		
 		dir.y = 1.0f;
-		
-		if( IsKeyDown(KEY_LEFT_CONTROL) )//scale
-		{
-			ApplyFuncToList( ScaleNode, &dir);
-		}
-		else if( IsKeyDown(KEY_LEFT_SHIFT) )//rotate
-		{
-			ApplyFuncToList( RotateNode, &dir);
-		}
-		else//translate
-		{
-			ApplyFuncToList( TranslateNode, &dir);
-		}
 	}
 	else if ( IsKeyDown(KEY_U) )//-Y
 	{
 		canTransform = false;
 		
 		dir.y = -1.0f;
-		
+	}
+	
+	if (!canTransform)
+	{
 		if( IsKeyDown(KEY_LEFT_CONTROL) )//scale
 		{
 			ApplyFuncToList( ScaleNode, &dir);
@@ -747,6 +696,8 @@ void GameplayLoop()
 	{
 		AddNode();
 	}
+	
+	DuplicateSelection();
 	
 	ToggleCursor();
 	

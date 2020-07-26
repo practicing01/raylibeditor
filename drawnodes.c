@@ -31,7 +31,16 @@ void DrawNodes()
 		if ( (*curNode).nodeType == NODE)
 		{
 			//struct nodeTypeData *data = (struct nodeTypeData*)( (*curNode).nodeData );
-			DrawCube( (*curNode).loc, 1.0f, 1.0f, 1.0f, tint);
+			DrawCube( (*curNode).loc, (*curNode).scale.x, (*curNode).scale.y, (*curNode).scale.z, tint);
+			
+			if ( (*curNode).colShape == BOX)
+			{
+				DrawCube( (*curNode).loc, (*curNode).colScale.x, (*curNode).colScale.y, (*curNode).colScale.z, SKYBLUE);
+			}
+			else if ( (*curNode).colShape == SPHERE )
+			{
+				DrawSphere( (*curNode).loc, (*curNode).colScale.x, SKYBLUE);
+			}
 		}
 		else if ( (*curNode).nodeType == MODEL)
 		{
@@ -47,6 +56,15 @@ void DrawNodes()
 			});
 			
 			DrawModelEx( (*data).model, (*curNode).loc, Vector3Zero(), 0.0f, (*curNode).scale, tint);
+			
+			if ( (*curNode).colShape == BOX)
+			{
+				DrawCube( (*curNode).loc, (*curNode).colScale.x, (*curNode).colScale.y, (*curNode).colScale.z, SKYBLUE);
+			}
+			else if ( (*curNode).colShape == SPHERE )
+			{
+				DrawSphere( (*curNode).loc, (*curNode).colScale.x, SKYBLUE);
+			}
 		}
 		
 		curNode = (*curNode).next;

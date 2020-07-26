@@ -84,6 +84,7 @@ void RemoveSelectedNode(struct nodeProperties *node);
 void FreeSelectedList();
 void ApplyFuncToList( void (*fun)(struct selectedNode *node, void *param), void *param );
 void PopulateSelectionProps(struct nodeProperties *node);
+void DuplicateSelection();
 
 void TransformNodes();
 void ApplyTransform(struct selectedNode *node, void *param);
