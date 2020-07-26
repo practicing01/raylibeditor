@@ -36,7 +36,17 @@ void DrawNodes()
 		else if ( (*curNode).nodeType == MODEL)
 		{
 			struct modelTypeData *data = (struct modelTypeData*)( (*curNode).nodeData );
-			DrawModel( (*data).model, (*curNode).loc, 1.0f, tint);
+			//DrawModel( (*data).model, (*curNode).loc, 1.0f, tint);
+			
+			(*data).model.transform = MatrixRotateXYZ(
+			(Vector3)
+			{
+				(*curNode).rot.x * DEG2RAD,
+				(*curNode).rot.y * DEG2RAD,
+				(*curNode).rot.z * DEG2RAD
+			});
+			
+			DrawModelEx( (*data).model, (*curNode).loc, Vector3Zero(), 0.0f, (*curNode).scale, tint);
 		}
 		
 		curNode = (*curNode).next;
