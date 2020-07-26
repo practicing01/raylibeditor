@@ -113,6 +113,28 @@ void TranslateNode(struct selectedNode *node, void *param)
 	(*nodeProps).loc = Vector3Add((*nodeProps).loc, offset);
 }
 
+void RotateNode(struct selectedNode *node, void *param)
+{
+	struct nodeProperties *nodeProps = (*node).node;
+	Vector3 dir = *( (Vector3*) param);
+	Vector3 offset = Vector3Multiply(genProps.rotInt, dir);
+	
+	(*nodeProps).rot = Vector3Add((*nodeProps).rot, offset);
+	
+	(*nodeProps).rot.x = fmod( (*nodeProps).rot.x, 360.0f);
+	(*nodeProps).rot.y = fmod( (*nodeProps).rot.y, 360.0f);
+	(*nodeProps).rot.z = fmod( (*nodeProps).rot.z, 360.0f);
+}
+
+void ScaleNode(struct selectedNode *node, void *param)
+{
+	struct nodeProperties *nodeProps = (*node).node;
+	Vector3 dir = *( (Vector3*) param);
+	Vector3 offset = Vector3Multiply(genProps.scaleInt, dir);
+	
+	(*nodeProps).scale = Vector3Add((*nodeProps).scale, offset);
+}
+
 void ApplyFuncToList( void (*fun)(struct selectedNode *node, void *param), void *param )
 {
 	struct selectedNode *curNode;
@@ -152,7 +174,7 @@ void TransformNodes()
 	
 	Vector3 dir = (Vector3){ 0.0f, 0.0f, 0.0f };
 	
-	if ( IsKeyDown(KEY_U) )//+Z
+	if ( IsKeyDown(KEY_I) )//+Z
 	{
 		canTransform = false;
 		
@@ -160,18 +182,18 @@ void TransformNodes()
 		
 		if( IsKeyDown(KEY_LEFT_CONTROL) )//scale
 		{
-			//
+			ApplyFuncToList( ScaleNode, &dir);
 		}
 		else if( IsKeyDown(KEY_LEFT_SHIFT) )//rotate
 		{
-			//
+			ApplyFuncToList( RotateNode, &dir);
 		}
 		else//translate
 		{
 			ApplyFuncToList( TranslateNode, &dir);
 		}
 	}
-	else if ( IsKeyDown(KEY_J) )//-Z
+	else if ( IsKeyDown(KEY_K) )//-Z
 	{
 		canTransform = false;
 		
@@ -179,11 +201,11 @@ void TransformNodes()
 		
 		if( IsKeyDown(KEY_LEFT_CONTROL) )//scale
 		{
-			//
+			ApplyFuncToList( ScaleNode, &dir);
 		}
 		else if( IsKeyDown(KEY_LEFT_SHIFT) )//rotate
 		{
-			//
+			ApplyFuncToList( RotateNode, &dir);
 		}
 		else//translate
 		{
@@ -191,7 +213,7 @@ void TransformNodes()
 		}
 	}
 	
-	if ( IsKeyDown(KEY_K) )//+X
+	if ( IsKeyDown(KEY_L) )//+X
 	{
 		canTransform = false;
 		
@@ -199,18 +221,18 @@ void TransformNodes()
 		
 		if( IsKeyDown(KEY_LEFT_CONTROL) )//scale
 		{
-			//
+			ApplyFuncToList( ScaleNode, &dir);
 		}
 		else if( IsKeyDown(KEY_LEFT_SHIFT) )//rotate
 		{
-			//
+			ApplyFuncToList( RotateNode, &dir);
 		}
 		else//translate
 		{
 			ApplyFuncToList( TranslateNode, &dir);
 		}
 	}
-	else if ( IsKeyDown(KEY_H) )//-X
+	else if ( IsKeyDown(KEY_J) )//-X
 	{
 		canTransform = false;
 		
@@ -218,11 +240,11 @@ void TransformNodes()
 		
 		if( IsKeyDown(KEY_LEFT_CONTROL) )//scale
 		{
-			//
+			ApplyFuncToList( ScaleNode, &dir);
 		}
 		else if( IsKeyDown(KEY_LEFT_SHIFT) )//rotate
 		{
-			//
+			ApplyFuncToList( RotateNode, &dir);
 		}
 		else//translate
 		{
@@ -230,7 +252,7 @@ void TransformNodes()
 		}
 	}
 	
-	if ( IsKeyDown(KEY_I) )//+Y
+	if ( IsKeyDown(KEY_O) )//+Y
 	{
 		canTransform = false;
 		
@@ -238,18 +260,18 @@ void TransformNodes()
 		
 		if( IsKeyDown(KEY_LEFT_CONTROL) )//scale
 		{
-			//
+			ApplyFuncToList( ScaleNode, &dir);
 		}
 		else if( IsKeyDown(KEY_LEFT_SHIFT) )//rotate
 		{
-			//
+			ApplyFuncToList( RotateNode, &dir);
 		}
 		else//translate
 		{
 			ApplyFuncToList( TranslateNode, &dir);
 		}
 	}
-	else if ( IsKeyDown(KEY_Y) )//-Y
+	else if ( IsKeyDown(KEY_U) )//-Y
 	{
 		canTransform = false;
 		
@@ -257,11 +279,11 @@ void TransformNodes()
 		
 		if( IsKeyDown(KEY_LEFT_CONTROL) )//scale
 		{
-			//
+			ApplyFuncToList( ScaleNode, &dir);
 		}
 		else if( IsKeyDown(KEY_LEFT_SHIFT) )//rotate
 		{
-			//
+			ApplyFuncToList( RotateNode, &dir);
 		}
 		else//translate
 		{
