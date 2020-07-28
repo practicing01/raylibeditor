@@ -11,10 +11,76 @@ void DuplicateSelection()
 {
 	if ( IsKeyReleased(KEY_V) )
 	{
-		if( IsKeyDown(KEY_LEFT_CONTROL) )
+		if ( IsKeyDown(KEY_LEFT_CONTROL) )
 		{
-			//
+			struct selectedNode *curNode;
+			curNode = selectedNodesListStart;
+			
+			while (curNode != NULL)
+			{
+				struct nodeProperties *node = (*curNode).node;
+				
+				struct nodeProperties* dupNode = AddNodeProps( (*node).nodeType );
+				
+				(*dupNode).selected = false;
+				(*dupNode).loc = (*node).loc;
+				(*dupNode).rot = (*node).rot;
+				(*dupNode).scale = (*node).scale;
+				(*dupNode).trigger = (*node).trigger;
+				(*dupNode).colScale = (*node).colScale;
+				(*dupNode).colShape = (*node).colShape;
+				(*dupNode).colLayer = (*node).colLayer;
+				(*dupNode).LayerCol = (*node).LayerCol;
+				(*dupNode).visible = (*node).visible;
+				(*dupNode).hidden = (*node).hidden;
+				
+				if ( (*node).nodeType == NODE)
+				{
+					struct nodeTypeData *data = (struct nodeTypeData*)( (*node).nodeData );
+					struct nodeTypeData *dupData = (struct nodeTypeData*)( (*dupNode).nodeData );
+					//
+				}
+				else if ( (*node).nodeType == MODEL)
+				{
+					if (modelListActive != -1)
+					{
+					 	struct modelTypeData *data = (struct modelTypeData*)( (*node).nodeData );
+						struct modelTypeData *dupData = (struct modelTypeData*)( (*dupNode).nodeData );
+						
+						strcpy( (*dupData).filepath, (*data).filepath );
+						
+						(*dupData).model = LoadModel( (*dupData).filepath );
+						
+						(*dupData).animated = (*data).animated;
+						(*dupData).frames = (*data).frames;
+					}
+				}
+				
+				curNode = (*curNode).next;
+			}
 		}
+	}
+}
+
+void DeleteSelection()
+{
+	if ( IsKeyReleased(KEY_DELETE) )
+	{
+		struct selectedNode *curNode;
+		curNode = selectedNodesListStart;
+		
+		while (curNode != NULL)
+		{
+			struct nodeProperties *node = (*curNode).node;
+			
+			RemoveNodeProps(node);
+			
+			(*curNode).node = NULL;
+			
+			curNode = (*curNode).next;
+		}
+		
+		FreeSelectedList();
 	}
 }
 
@@ -558,6 +624,9 @@ void FreeNodePropsList()
 		
 		curNode = nextNode;
 	}
+	
+	selectedNodesListStart = NULL;
+	selectedNodesListEnd = NULL;
 }
 
 void FreeSelectedList()
@@ -569,7 +638,11 @@ void FreeSelectedList()
 	while (curNode != NULL)
 	{
 		struct nodeProperties *node = (*curNode).node;
-		(*node).selected = false;
+		
+		if (node != NULL)
+		{
+			(*node).selected = false;
+		}
 		
 		nextNode = (*curNode).next;
 		
@@ -698,6 +771,7 @@ void GameplayLoop()
 	}
 	
 	DuplicateSelection();
+	DeleteSelection();
 	
 	ToggleCursor();
 	
