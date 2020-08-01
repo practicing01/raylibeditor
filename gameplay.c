@@ -7,6 +7,12 @@
 #include "drawnodes.h"
 #include "raymath.h"
 
+#if defined(PLATFORM_DESKTOP)
+    #define GLSL_VERSION            330
+#else   // PLATFORM_RPI, PLATFORM_ANDROID, PLATFORM_WEB
+    #define GLSL_VERSION            100
+#endif
+
 void LoadScene()
 {
 	TraceLog(LOG_INFO, "LoadScene");
@@ -170,18 +176,15 @@ void DuplicateSelection()
 				}
 				else if ( (*node).nodeType == MODEL)
 				{
-					if (modelListActive != -1)
-					{
-					 	struct modelTypeData *data = (struct modelTypeData*)( (*node).nodeData );
-						struct modelTypeData *dupData = (struct modelTypeData*)( (*dupNode).nodeData );
-						
-						strcpy( (*dupData).filepath, (*data).filepath );
-						
-						(*dupData).model = LoadModel( (*dupData).filepath );
-						
-						(*dupData).animated = (*data).animated;
-						(*dupData).frames = (*data).frames;
-					}
+					struct modelTypeData *data = (struct modelTypeData*)( (*node).nodeData );
+					struct modelTypeData *dupData = (struct modelTypeData*)( (*dupNode).nodeData );
+					
+					strcpy( (*dupData).filepath, (*data).filepath );
+					
+					(*dupData).model = LoadModel( (*dupData).filepath );
+					
+					(*dupData).animated = (*data).animated;
+					(*dupData).frames = (*data).frames;
 				}
 				
 				curNode = (*curNode).next;
@@ -385,17 +388,17 @@ void TransformNodes()
 	
 	Vector3 dir = (Vector3){ 0.0f, 0.0f, 0.0f };
 	
-	if ( IsKeyDown(KEY_I) )//+Z
-	{
-		canTransform = false;
-		
-		dir.z = 1.0f;
-	}
-	else if ( IsKeyDown(KEY_K) )//-Z
+	if ( IsKeyDown(KEY_I) )//-Z
 	{
 		canTransform = false;
 		
 		dir.z = -1.0f;
+	}
+	else if ( IsKeyDown(KEY_K) )//+Z
+	{
+		canTransform = false;
+		
+		dir.z = 1.0f;
 	}
 	
 	if ( IsKeyDown(KEY_L) )//+X
@@ -899,10 +902,14 @@ void GameplayInit()
 	
 	nodeCount = 0;
 	objectIDCounter = 0;
+	
+	alphaShader = LoadShader(0, FormatText("shaders/glsl%i/alphaShader.fs", GLSL_VERSION));
 }
 
 void GameplayExit()
 {
+	UnloadShader(alphaShader);
+	
 	FreeNodePropsList();
 	FreeSelectedList();
 }

@@ -59,17 +59,19 @@ void DrawNodes()
 				(*curNode).rot.z * DEG2RAD
 			});
 			
+			//BeginShaderMode(alphaShader);
 			DrawModelEx( (*data).model, (*curNode).loc, Vector3Zero(), 0.0f, (*curNode).scale, tint);
+			//EndShaderMode();
 			
 			BeginBlendMode(BLEND_MULTIPLIED);
 			
 			if ( (*curNode).colShape == BOX)
 			{
-				DrawCube( (*curNode).loc, (*curNode).colScale.x, (*curNode).colScale.y, (*curNode).colScale.z, SKYBLUE);
+				//DrawCube( (*curNode).loc, (*curNode).colScale.x, (*curNode).colScale.y, (*curNode).colScale.z, SKYBLUE);
 			}
 			else if ( (*curNode).colShape == SPHERE )
 			{
-				DrawSphere( (*curNode).loc, (*curNode).colScale.x, SKYBLUE);
+				//DrawSphere( (*curNode).loc, (*curNode).colScale.x, SKYBLUE);
 			}
 			
 			EndBlendMode();

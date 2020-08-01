@@ -105,4 +105,6 @@ int nodeCount;
 void SaveScene();//todo add filename to general properties list
 void LoadScene();
 
+Shader alphaShader;
+
 #endif
