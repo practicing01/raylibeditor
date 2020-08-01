@@ -33,6 +33,8 @@ void DrawNodes()
 			//struct nodeTypeData *data = (struct nodeTypeData*)( (*curNode).nodeData );
 			DrawCube( (*curNode).loc, (*curNode).scale.x, (*curNode).scale.y, (*curNode).scale.z, tint);
 			
+			BeginBlendMode(BLEND_MULTIPLIED);
+			
 			if ( (*curNode).colShape == BOX)
 			{
 				DrawCube( (*curNode).loc, (*curNode).colScale.x, (*curNode).colScale.y, (*curNode).colScale.z, SKYBLUE);
@@ -41,6 +43,8 @@ void DrawNodes()
 			{
 				DrawSphere( (*curNode).loc, (*curNode).colScale.x, SKYBLUE);
 			}
+			
+			EndBlendMode();
 		}
 		else if ( (*curNode).nodeType == MODEL)
 		{
@@ -57,6 +61,8 @@ void DrawNodes()
 			
 			DrawModelEx( (*data).model, (*curNode).loc, Vector3Zero(), 0.0f, (*curNode).scale, tint);
 			
+			BeginBlendMode(BLEND_MULTIPLIED);
+			
 			if ( (*curNode).colShape == BOX)
 			{
 				DrawCube( (*curNode).loc, (*curNode).colScale.x, (*curNode).colScale.y, (*curNode).colScale.z, SKYBLUE);
@@ -65,6 +71,8 @@ void DrawNodes()
 			{
 				DrawSphere( (*curNode).loc, (*curNode).colScale.x, SKYBLUE);
 			}
+			
+			EndBlendMode();
 		}
 		
 		curNode = (*curNode).next;

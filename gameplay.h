@@ -44,6 +44,9 @@ struct nodeProperties
 	bool visible;
 	bool hidden;
 	bool selected;
+	int objectID;
+	int childCount;
+	int parentCount;
 	
 	struct nodeProperties *prev;
 	struct nodeProperties *next;
@@ -95,5 +98,10 @@ void ScaleNode(struct selectedNode *node, void *param);
 float transformElapsedTime;
 float transformInterval;
 bool canTransform;
+
+int objectIDCounter;
+int nodeCount;
+void SaveScene();//todo add filename to general properties list
+void LoadScene();
 
 #endif

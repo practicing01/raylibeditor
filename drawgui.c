@@ -164,6 +164,8 @@ void DrawGui()
 	//open dialog
 	if (fileDialogState.SelectFilePressed)
 	{
+		LoadScene();
+		
 		// Load image file (if supported extension)
 		if (IsFileExtension(fileDialogState.fileNameText, ".txt"))
 		{
@@ -184,7 +186,7 @@ void DrawGui()
 	GuiSetStyle(BUTTON, TEXT_ALIGNMENT, GUI_TEXT_ALIGN_CENTER);
 	if (GuiButton((Rectangle){ 140, 0, 125, 30 }, GuiIconText(RICON_FILE_SAVE, "Save File")))
 	{
-		//
+		SaveScene();
 	}
     
     //general properties list

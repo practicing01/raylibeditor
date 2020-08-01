@@ -7,6 +7,133 @@
 #include "drawnodes.h"
 #include "raymath.h"
 
+void LoadScene()
+{
+	TraceLog(LOG_INFO, "LoadScene");
+	
+	int intSize = sizeof(int);
+	int nodePropSize = sizeof(struct nodeProperties);
+	int modelTypeSize = sizeof(struct modelTypeData);
+	
+	void *buffer;
+	int bufferSize = 0;
+	int bufferPos = 0;
+	
+	buffer = (void*)LoadFileData("scene", &bufferSize);
+	
+	memcpy(&objectIDCounter, buffer, intSize );
+	bufferPos += intSize;
+	
+	memcpy(&nodeCount, buffer + bufferPos, intSize );
+	bufferPos += intSize;
+	
+	TraceLog(LOG_INFO, "loaded objectIDCounter: %i, nodeCount: %i", objectIDCounter, nodeCount);
+	
+	struct nodeProperties curNode;//temporary storage
+	
+	for (int x = 0; x < nodeCount; x++)
+	{
+		memcpy(&curNode, buffer + bufferPos, nodePropSize );
+		bufferPos += nodePropSize;
+		
+		//load parents and children here
+		
+		struct nodeProperties *newNode = AddNodeProps(curNode.nodeType);
+		
+		//backup pointers
+		struct nodeProperties *prev = (*newNode).prev;
+		struct nodeProperties *next = (*newNode).next;
+		void *nodeData = (*newNode).nodeData;
+		
+		//copy data
+		memcpy(newNode, &curNode, nodePropSize );
+		
+		//restore pointers
+		(*newNode).prev = prev;
+		(*newNode).next = next;
+		(*newNode).nodeData = nodeData;
+
+		if ( (*newNode).nodeType == NODE)
+		{
+			//
+		}
+		else if ( (*newNode).nodeType == MODEL)
+		{
+			struct modelTypeData *data = (struct modelTypeData*)( (*newNode).nodeData );
+			
+			memcpy( data , buffer + bufferPos, modelTypeSize );
+			bufferPos += modelTypeSize;
+			
+			TraceLog(LOG_INFO, (*data).filepath);
+						
+			(*data).model = LoadModel( (*data).filepath );
+		}
+	}
+}
+
+void SaveScene()
+{
+	int intSize = sizeof(int);
+	int nodePropSize = sizeof(struct nodeProperties);
+	int modelTypeSize = sizeof(struct modelTypeData);
+	
+	void *buffer;
+	int bufferSize = 0;
+	int bufferPos = 0;
+	
+	bufferSize += intSize * 2;//objectIDCounter and nodeCount;
+	bufferSize += nodePropSize * nodeCount;
+	
+	TraceLog(LOG_INFO, "saving objectIDCounter: %i, nodeCount: %i", objectIDCounter, nodeCount);
+
+	//prepass to sum child/parent list sizes
+	struct nodeProperties *curNode;
+	curNode = nodePropListStart;
+	
+	while (curNode != NULL)
+	{
+		bufferSize += intSize * ( (*curNode).childCount );
+		bufferSize += intSize * ( (*curNode).parentCount );
+		
+		if ( (*curNode).nodeType == MODEL)
+		{
+			bufferSize += modelTypeSize;
+		}
+		
+		curNode = (*curNode).next;
+	}
+	
+	buffer = (void *)malloc( bufferSize );
+	
+	memcpy(buffer, &objectIDCounter, intSize );
+	bufferPos += intSize;
+	
+	memcpy(buffer + bufferPos, &nodeCount, intSize );
+	bufferPos += intSize;
+
+	curNode = nodePropListStart;
+	
+	while (curNode != NULL)
+	{
+		memcpy(buffer + bufferPos, curNode, nodePropSize );
+		bufferPos += nodePropSize;
+		
+		//save parents and children here
+		
+		if ( (*curNode).nodeType == MODEL)
+		{
+			struct modelTypeData *data = (struct modelTypeData*)( (*curNode).nodeData );
+			memcpy(buffer + bufferPos, data, modelTypeSize );
+			bufferPos += modelTypeSize;
+		}
+		
+		curNode = (*curNode).next;
+	}
+	
+	SaveFileData("scene", buffer, bufferSize);
+	TraceLog(LOG_INFO, "SaveScene");
+}
+
 void DuplicateSelection()
 {
 	if ( IsKeyReleased(KEY_V) )
@@ -461,6 +588,9 @@ void AddNode()
 {
 	struct nodeProperties *node = AddNodeProps(nodeTypeActive);
 	
+	nodeCount++;
+	objectIDCounter++;
+	
 	(*node).selected = false;
 	(*node).loc = drawNodesCam.position;
 	(*node).rot = Vector3Zero();
@@ -472,6 +602,9 @@ void AddNode()
 	(*node).LayerCol = 0;
 	(*node).visible = true;
 	(*node).hidden = false;
+	(*node).objectID = objectIDCounter;
+	(*node).childCount = 0;
+	(*node).parentCount = 0;
 	
 	if (nodeTypeActive == NODE)
 	{
@@ -480,31 +613,33 @@ void AddNode()
 	}
 	else if (nodeTypeActive == MODEL)
 	{
-		if (modelListActive != -1)
+		if (modelListActive == -1)
 		{
-			struct modelTypeData *data = (struct modelTypeData*)( (*node).nodeData );
-			
-			//TraceLog(LOG_INFO, GetWorkingDirectory());
-			const char *workDir = GetWorkingDirectory();
-			int workDirLen = strlen(workDir);
-			char *offset = strstr(modelFiles[modelListActive], workDir);
-			
-			if (offset != NULL)
-			{
-				strcpy((*data).filepath, offset + workDirLen + 1);//chop off home path
-			}
-			else
-			{
-				strcpy((*data).filepath, modelFiles[modelListActive]);
-			}
-			
-			TraceLog(LOG_INFO, (*data).filepath);
-						
-			(*data).model = LoadModel(modelFiles[modelListActive]);
-			
-			(*data).animated = false;
-			(*data).frames = Vector2Zero();
+			modelListActive = 0;
 		}
+		
+		struct modelTypeData *data = (struct modelTypeData*)( (*node).nodeData );
+		
+		//TraceLog(LOG_INFO, GetWorkingDirectory());
+		const char *workDir = GetWorkingDirectory();
+		int workDirLen = strlen(workDir);
+		char *offset = strstr(modelFiles[modelListActive], workDir);
+		
+		if (offset != NULL)
+		{
+			strcpy((*data).filepath, offset + workDirLen + 1);//chop off home path
+		}
+		else
+		{
+			strcpy((*data).filepath, modelFiles[modelListActive]);
+		}
+		
+		TraceLog(LOG_INFO, (*data).filepath);
+					
+		(*data).model = LoadModel(modelFiles[modelListActive]);
+		
+		(*data).animated = false;
+		(*data).frames = Vector2Zero();
 	}
 	
 }
@@ -585,6 +720,8 @@ void RemoveNodeProps(struct nodeProperties* node)
 			
 			FreeNodeData(curNode);
 			free(curNode);
+			
+			nodeCount--;
 			break;
 		}
 		else
@@ -751,6 +888,9 @@ void GameplayInit()
 	transformElapsedTime = 0.0f;
 	transformInterval = 0.25f;
 	canTransform = true;
+	
+	nodeCount = 0;
+	objectIDCounter = 0;
 }
 
 void GameplayExit()
@@ -784,7 +924,7 @@ void GameplayLoop()
 	}
 	
 	BeginDrawing();
-		ClearBackground(RAYWHITE);
+		ClearBackground(BLANK);
 		
 		DrawNodes();
 		
