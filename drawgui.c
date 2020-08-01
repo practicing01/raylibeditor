@@ -109,7 +109,8 @@ GuiDMProperty selProp[] = {
 	PBOOL("Animated", 0, false),
 	PVEC2("Frames", 0, 0, 20),
 	PBOOL("Visible", 0, true),
-	PBOOL("Hidden", 0, false)
+	PBOOL("Hidden", 0, false),
+	PINT("Misc", 0, 0)
 };
 int selPropFocus = 0, selPropScroll = 0;
 

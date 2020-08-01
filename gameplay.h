@@ -47,6 +47,7 @@ struct nodeProperties
 	int objectID;
 	int childCount;
 	int parentCount;
+	int misc;
 	
 	struct nodeProperties *prev;
 	struct nodeProperties *next;

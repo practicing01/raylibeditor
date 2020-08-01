@@ -160,6 +160,7 @@ void DuplicateSelection()
 				(*dupNode).LayerCol = (*node).LayerCol;
 				(*dupNode).visible = (*node).visible;
 				(*dupNode).hidden = (*node).hidden;
+				(*dupNode).misc = (*node).misc;
 				
 				if ( (*node).nodeType == NODE)
 				{
@@ -193,21 +194,24 @@ void DeleteSelection()
 {
 	if ( IsKeyReleased(KEY_DELETE) )
 	{
-		struct selectedNode *curNode;
-		curNode = selectedNodesListStart;
-		
-		while (curNode != NULL)
+		if ( IsKeyDown(KEY_LEFT_CONTROL) )
 		{
-			struct nodeProperties *node = (*curNode).node;
+			struct selectedNode *curNode;
+			curNode = selectedNodesListStart;
 			
-			RemoveNodeProps(node);
+			while (curNode != NULL)
+			{
+				struct nodeProperties *node = (*curNode).node;
+				
+				RemoveNodeProps(node);
+				
+				(*curNode).node = NULL;
+				
+				curNode = (*curNode).next;
+			}
 			
-			(*curNode).node = NULL;
-			
-			curNode = (*curNode).next;
+			FreeSelectedList();
 		}
-		
-		FreeSelectedList();
 	}
 }
 
@@ -257,6 +261,7 @@ void PopulateSelectionProps(struct nodeProperties *node)
 	
 	selProp[78].value.vbool = (*node).hidden;
 	
+	selProp[79].value.vint.val = (*node).misc;	
 }
 
 void ApplyTransform(struct selectedNode *node, void *param)
@@ -306,6 +311,8 @@ void ApplyTransform(struct selectedNode *node, void *param)
 	(*nodeProps).visible = selProp[77].value.vbool;
 	
 	(*nodeProps).hidden = selProp[78].value.vbool;
+	
+	(*nodeProps).misc = selProp[79].value.vint.val;
 }
 
 void TranslateNode(struct selectedNode *node, void *param)
@@ -605,6 +612,7 @@ void AddNode()
 	(*node).objectID = objectIDCounter;
 	(*node).childCount = 0;
 	(*node).parentCount = 0;
+	(*node).misc = 0;
 	
 	if (nodeTypeActive == NODE)
 	{
